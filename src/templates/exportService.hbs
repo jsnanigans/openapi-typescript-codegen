@@ -84,7 +84,7 @@ export class {{{name}}} {
             },
             {{/if}}
         });
-        return result.body;
+        return { body: result.body, headers: result.headers };
     }
 
     {{/each}}
