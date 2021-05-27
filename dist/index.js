@@ -3135,7 +3135,7 @@ var templateExportService = {"1":function(container,depth0,helpers,partials,data
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,lookupProperty(depth0,"parametersBody"),{"name":"if","hash":{},"fn":container.program(28, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":70,"column":12},"end":{"line":75,"column":19}}})) != null ? stack1 : "")
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,lookupProperty(depth0,"responseHeader"),{"name":"if","hash":{},"fn":container.program(31, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":76,"column":12},"end":{"line":78,"column":19}}})) != null ? stack1 : "")
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,lookupProperty(depth0,"errors"),{"name":"if","hash":{},"fn":container.program(33, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":79,"column":12},"end":{"line":85,"column":19}}})) != null ? stack1 : "")
-    + "        });\n        return result.body;\n    }\n\n";
+    + "        });\n        return { body: result.body, headers: result.headers };\n    }\n\n";
 },"7":function(container,depth0,helpers,partials,data) {
     return "     * @deprecated\n";
 },"9":function(container,depth0,helpers,partials,data) {
