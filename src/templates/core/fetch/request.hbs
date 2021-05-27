@@ -67,7 +67,7 @@ export async function request(options: ApiRequestOptions): Promise<ApiResultWith
         ok: response.ok,
         status: response.status,
         statusText: response.statusText,
-        body: responseHeader || responseBody,
+        body: responseBody,
         headers: response.headers,
     };
 
