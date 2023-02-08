@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 var os = require('os');
 var camelCase = require('camelcase');
 var jsYaml = require('js-yaml');
@@ -15,10 +13,7 @@ var http = require('http');
 var https = require('https');
 var Handlebars = require('handlebars/runtime');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-function _interopNamespace(e) {
-    if (e && e.__esModule) return e;
+function _interopNamespaceDefault(e) {
     var n = Object.create(null);
     if (e) {
         Object.keys(e).forEach(function (k) {
@@ -26,22 +21,16 @@ function _interopNamespace(e) {
                 var d = Object.getOwnPropertyDescriptor(e, k);
                 Object.defineProperty(n, k, d.get ? d : {
                     enumerable: true,
-                    get: function () {
-                        return e[k];
-                    }
+                    get: function () { return e[k]; }
                 });
             }
         });
     }
-    n['default'] = e;
+    n.default = e;
     return Object.freeze(n);
 }
 
-var camelCase__default = /*#__PURE__*/_interopDefaultLegacy(camelCase);
-var RefParser__default = /*#__PURE__*/_interopDefaultLegacy(RefParser);
-var mkdirp__default = /*#__PURE__*/_interopDefaultLegacy(mkdirp);
-var rimraf__default = /*#__PURE__*/_interopDefaultLegacy(rimraf);
-var Handlebars__namespace = /*#__PURE__*/_interopNamespace(Handlebars);
+var Handlebars__namespace = /*#__PURE__*/_interopNamespaceDefault(Handlebars);
 
 exports.HttpClient = void 0;
 (function (HttpClient) {
@@ -602,7 +591,7 @@ function getOperationName$1(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    return camelCase__default['default'](clean);
+    return camelCase(clean);
 }
 
 function getOperationParameterDefault(parameter, operationParameter) {
@@ -647,7 +636,7 @@ function getOperationParameterName$1(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    return camelCase__default['default'](clean).replace(reservedWords$1, '_$1');
+    return camelCase(clean).replace(reservedWords$1, '_$1');
 }
 
 function getOperationParameter$1(openApi, parameter) {
@@ -1061,7 +1050,7 @@ function getServiceClassName$1(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    const name = camelCase__default['default'](clean, { pascalCase: true });
+    const name = camelCase(clean, { pascalCase: true });
     if (name && !name.endsWith('Service')) {
         return `${name}Service`;
     }
@@ -1786,7 +1775,7 @@ function getOperationName(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    return camelCase__default['default'](clean);
+    return camelCase(clean);
 }
 
 const reservedWords = /^(arguments|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|eval|export|extends|false|finally|for|function|if|implements|import|in|instanceof|interface|let|new|null|package|private|protected|public|return|static|super|switch|this|throw|true|try|typeof|var|void|while|with|yield)$/g;
@@ -1799,7 +1788,7 @@ function getOperationParameterName(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    return camelCase__default['default'](clean).replace(reservedWords, '_$1');
+    return camelCase(clean).replace(reservedWords, '_$1');
 }
 
 function getOperationParameter(openApi, parameter) {
@@ -2249,7 +2238,7 @@ function getServiceClassName(value) {
         .replace(/^[^a-zA-Z]+/g, '')
         .replace(/[^\w\-]+/g, '-')
         .trim();
-    const name = camelCase__default['default'](clean, { pascalCase: true });
+    const name = camelCase(clean, { pascalCase: true });
     if (name && !name.endsWith('Service')) {
         return `${name}Service`;
     }
@@ -2392,10 +2381,10 @@ const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
 const exists = util.promisify(fs.exists);
 // Re-export from mkdirp to make mocking easier
-const mkdir = mkdirp__default['default'];
+const mkdir = mkdirp;
 // Promisified version of rimraf
 const rmdir = (path) => new Promise((resolve, reject) => {
-    rimraf__default['default'](path, (error) => {
+    rimraf(path, (error) => {
         if (error) {
             reject(error);
         }
@@ -2505,7 +2494,7 @@ async function getOpenApiSpec(input) {
             }
             break;
     }
-    return await RefParser__default['default'].bundle(rootObject);
+    return await RefParser.bundle(rootObject);
 }
 
 var OpenApiVersion;
@@ -2738,7 +2727,7 @@ var fetchRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,h
 },"usePartial":true,"useData":true};
 
 var fetchSendRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {\n    const request: RequestInit = {\n        method: options.method,\n        headers: await getHeaders(options),\n        body: getRequestBody(options),\n    };\n    if (OpenAPI.WITH_CREDENTIALS) {\n        request.credentials = 'include';\n    }\n    return await fetch(url, request);\n}";
+    return "async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {\n    const request: RequestInit = {\n        method: options.method,\n        headers: await getHeaders(options),\n        body: getRequestBody(options),\n    };\n    if (OpenAPI.WITH_CREDENTIALS) {\n        request.credentials = 'include';\n    }\n    const fetchFn = typeof window.customFetch === 'function' ? window.customFetch : fetch;\n    return await fetchFn(url, request);\n}";
 },"useData":true};
 
 var functionCatchErrors = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -2842,7 +2831,7 @@ var nodeRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,he
 },"usePartial":true,"useData":true};
 
 var nodeSendRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {\n    const request: RequestInit = {\n        method: options.method,\n        headers: await getHeaders(options),\n        body: getRequestBody(options),\n    };\n    return await fetch(url, request);\n}";
+    return "async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {\n    const request: RequestInit = {\n        method: options.method,\n        headers: await getHeaders(options),\n        body: getRequestBody(options),\n    };\n    const fetchFn = typeof window.customFetch === 'function' ? window.customFetch : fetch;\n    return await fetchFn(url, request);\n}";
 },"useData":true};
 
 var templateCoreSettings = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
