@@ -31,8 +31,8 @@
             "email": "info@madebyferdi.com"
         }
     ],
-    "main": "dist/index.js",
-    "module": "dist/index.js",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
     "types": "types/index.d.ts",
     "bin": {
         "openapi": "bin/index.js"

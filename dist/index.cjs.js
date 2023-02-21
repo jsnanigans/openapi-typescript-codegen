@@ -1,22 +1,43 @@
-import { EOL } from 'os';
-import camelCase from 'camelcase';
-import { load } from 'js-yaml';
-import RefParser from 'json-schema-ref-parser';
-import { resolve, extname, relative } from 'path';
-import { readFile as readFile$1, writeFile as writeFile$1, copyFile as copyFile$1, exists as exists$1 } from 'fs';
-import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
-import { promisify } from 'util';
-import { get } from 'http';
-import { get as get$1 } from 'https';
-import * as Handlebars from 'handlebars/runtime';
+'use strict';
 
-var HttpClient;
+var os = require('os');
+var camelCase = require('camelcase');
+var jsYaml = require('js-yaml');
+var RefParser = require('json-schema-ref-parser');
+var path = require('path');
+var fs = require('fs');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
+var util = require('util');
+var http = require('http');
+var https = require('https');
+var Handlebars = require('handlebars/runtime');
+
+function _interopNamespaceDefault(e) {
+    var n = Object.create(null);
+    if (e) {
+        Object.keys(e).forEach(function (k) {
+            if (k !== 'default') {
+                var d = Object.getOwnPropertyDescriptor(e, k);
+                Object.defineProperty(n, k, d.get ? d : {
+                    enumerable: true,
+                    get: function () { return e[k]; }
+                });
+            }
+        });
+    }
+    n.default = e;
+    return Object.freeze(n);
+}
+
+var Handlebars__namespace = /*#__PURE__*/_interopNamespaceDefault(Handlebars);
+
+exports.HttpClient = void 0;
 (function (HttpClient) {
     HttpClient["FETCH"] = "fetch";
     HttpClient["XHR"] = "xhr";
     HttpClient["NODE"] = "node";
-})(HttpClient || (HttpClient = {}));
+})(exports.HttpClient || (exports.HttpClient = {}));
 
 /**
  * The spec generates a pattern like this '^\d{3}-\d{2}-\d{4}$'
@@ -53,7 +74,7 @@ function extendEnum$1(enumerators, definition) {
  */
 function getComment$1(comment) {
     if (comment) {
-        return comment.replace(/(\*\/)/g, '*_/').replace(/\r?\n(.*)/g, (_, w) => `${EOL} * ${w.trim()}`);
+        return comment.replace(/(\*\/)/g, '*_/').replace(/\r?\n(.*)/g, (_, w) => `${os.EOL} * ${w.trim()}`);
     }
     return null;
 }
@@ -1180,7 +1201,7 @@ function extendEnum(enumerators, definition) {
  */
 function getComment(comment) {
     if (comment) {
-        return comment.replace(/(\*\/)/g, '*_/').replace(/\r?\n(.*)/g, (_, w) => `${EOL} * ${w.trim()}`);
+        return comment.replace(/(\*\/)/g, '*_/').replace(/\r?\n(.*)/g, (_, w) => `${os.EOL} * ${w.trim()}`);
     }
     return null;
 }
@@ -2355,10 +2376,10 @@ function parse(openApi) {
 }
 
 // Wrapped file system calls
-const readFile = promisify(readFile$1);
-const writeFile = promisify(writeFile$1);
-const copyFile = promisify(copyFile$1);
-const exists = promisify(exists$1);
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
+const copyFile = util.promisify(fs.copyFile);
+const exists = util.promisify(fs.exists);
 // Re-export from mkdirp to make mocking easier
 const mkdir = mkdirp;
 // Promisified version of rimraf
@@ -2378,7 +2399,7 @@ const rmdir = (path) => new Promise((resolve, reject) => {
  * @param input
  */
 async function readSpecFromDisk(input) {
-    const filePath = resolve(process.cwd(), input);
+    const filePath = path.resolve(process.cwd(), input);
     const fileExists = await exists(filePath);
     if (fileExists) {
         try {
@@ -2398,7 +2419,7 @@ async function readSpecFromDisk(input) {
  */
 async function readSpecFromHttp(url) {
     return new Promise((resolve, reject) => {
-        get(url, response => {
+        http.get(url, response => {
             let body = '';
             response.on('data', chunk => {
                 body += chunk;
@@ -2419,7 +2440,7 @@ async function readSpecFromHttp(url) {
  */
 async function readSpecFromHttps(url) {
     return new Promise((resolve, reject) => {
-        get$1(url, response => {
+        https.get(url, response => {
             let body = '';
             response.on('data', chunk => {
                 body += chunk;
@@ -2451,14 +2472,14 @@ async function readSpec(input) {
  * @param input
  */
 async function getOpenApiSpec(input) {
-    const extension = extname(input).toLowerCase();
+    const extension = path.extname(input).toLowerCase();
     const content = await readSpec(input);
     let rootObject;
     switch (extension) {
         case '.yml':
         case '.yaml':
             try {
-                rootObject = load(content);
+                rootObject = jsYaml.load(content);
             }
             catch (e) {
                 throw new Error(`Could not parse OpenApi YAML: "${input}"`);
@@ -4735,17 +4756,17 @@ var partialTypeUnion = {"1":function(container,depth0,helpers,partials,data) {
 },"usePartial":true,"useData":true};
 
 function registerHandlebarHelpers(root) {
-    Handlebars.registerHelper('equals', function (a, b, options) {
+    Handlebars__namespace.registerHelper('equals', function (a, b, options) {
         return a === b ? options.fn(this) : options.inverse(this);
     });
-    Handlebars.registerHelper('notEquals', function (a, b, options) {
+    Handlebars__namespace.registerHelper('notEquals', function (a, b, options) {
         return a !== b ? options.fn(this) : options.inverse(this);
     });
-    Handlebars.registerHelper('containsSpaces', function (value, options) {
+    Handlebars__namespace.registerHelper('containsSpaces', function (value, options) {
         return /\s+/.test(value) ? options.fn(this) : options.inverse(this);
     });
-    Handlebars.registerHelper('union', function (properties, parent, options) {
-        const type = Handlebars.partials['type'];
+    Handlebars__namespace.registerHelper('union', function (properties, parent, options) {
+        const type = Handlebars__namespace.partials['type'];
         const types = properties.map(property => type(Object.assign(Object.assign(Object.assign({}, root), property), { parent })));
         const uniqueTypes = types.filter(unique);
         let uniqueTypesString = uniqueTypes.join(' | ');
@@ -4754,8 +4775,8 @@ function registerHandlebarHelpers(root) {
         }
         return options.fn(uniqueTypesString);
     });
-    Handlebars.registerHelper('intersection', function (properties, parent, options) {
-        const type = Handlebars.partials['type'];
+    Handlebars__namespace.registerHelper('intersection', function (properties, parent, options) {
+        const type = Handlebars__namespace.partials['type'];
         const types = properties.map(property => type(Object.assign(Object.assign(Object.assign({}, root), property), { parent })));
         const uniqueTypes = types.filter(unique);
         let uniqueTypesString = uniqueTypes.join(' & ');
@@ -4764,7 +4785,7 @@ function registerHandlebarHelpers(root) {
         }
         return options.fn(uniqueTypesString);
     });
-    Handlebars.registerHelper('enumerator', function (enumerators, parent, name, options) {
+    Handlebars__namespace.registerHelper('enumerator', function (enumerators, parent, name, options) {
         if (!root.useUnionTypes && parent && name) {
             return `${parent}.${name}`;
         }
@@ -4783,86 +4804,86 @@ function registerHandlebarTemplates(root) {
     registerHandlebarHelpers(root);
     // Main templates (entry points for the files we write to disk)
     const templates = {
-        index: Handlebars.template(templateIndex),
+        index: Handlebars__namespace.template(templateIndex),
         exports: {
-            model: Handlebars.template(templateExportModel),
-            schema: Handlebars.template(templateExportSchema),
-            service: Handlebars.template(templateExportService),
+            model: Handlebars__namespace.template(templateExportModel),
+            schema: Handlebars__namespace.template(templateExportSchema),
+            service: Handlebars__namespace.template(templateExportService),
         },
         core: {
-            settings: Handlebars.template(templateCoreSettings),
-            apiError: Handlebars.template(templateCoreApiError),
-            apiRequestOptions: Handlebars.template(templateCoreApiRequestOptions),
-            apiResult: Handlebars.template(templateCoreApiResult),
-            request: Handlebars.template(templateCoreRequest),
+            settings: Handlebars__namespace.template(templateCoreSettings),
+            apiError: Handlebars__namespace.template(templateCoreApiError),
+            apiRequestOptions: Handlebars__namespace.template(templateCoreApiRequestOptions),
+            apiResult: Handlebars__namespace.template(templateCoreApiResult),
+            request: Handlebars__namespace.template(templateCoreRequest),
         },
     };
     // Partials for the generations of the models, services, etc.
-    Handlebars.registerPartial('exportEnum', Handlebars.template(partialExportEnum));
-    Handlebars.registerPartial('exportInterface', Handlebars.template(partialExportInterface));
-    Handlebars.registerPartial('exportComposition', Handlebars.template(partialExportComposition));
-    Handlebars.registerPartial('exportType', Handlebars.template(partialExportType));
-    Handlebars.registerPartial('header', Handlebars.template(partialHeader));
-    Handlebars.registerPartial('isNullable', Handlebars.template(partialIsNullable));
-    Handlebars.registerPartial('isReadOnly', Handlebars.template(partialIsReadOnly));
-    Handlebars.registerPartial('isRequired', Handlebars.template(partialIsRequired));
-    Handlebars.registerPartial('parameters', Handlebars.template(partialParameters));
-    Handlebars.registerPartial('result', Handlebars.template(partialResult));
-    Handlebars.registerPartial('schema', Handlebars.template(partialSchema));
-    Handlebars.registerPartial('schemaArray', Handlebars.template(partialSchemaArray));
-    Handlebars.registerPartial('schemaDictionary', Handlebars.template(partialSchemaDictionary));
-    Handlebars.registerPartial('schemaEnum', Handlebars.template(partialSchemaEnum));
-    Handlebars.registerPartial('schemaGeneric', Handlebars.template(partialSchemaGeneric));
-    Handlebars.registerPartial('schemaInterface', Handlebars.template(partialSchemaInterface));
-    Handlebars.registerPartial('schemaComposition', Handlebars.template(partialSchemaComposition));
-    Handlebars.registerPartial('type', Handlebars.template(partialType));
-    Handlebars.registerPartial('typeArray', Handlebars.template(partialTypeArray));
-    Handlebars.registerPartial('typeDictionary', Handlebars.template(partialTypeDictionary));
-    Handlebars.registerPartial('typeEnum', Handlebars.template(partialTypeEnum));
-    Handlebars.registerPartial('typeGeneric', Handlebars.template(partialTypeGeneric));
-    Handlebars.registerPartial('typeInterface', Handlebars.template(partialTypeInterface));
-    Handlebars.registerPartial('typeReference', Handlebars.template(partialTypeReference));
-    Handlebars.registerPartial('typeUnion', Handlebars.template(partialTypeUnion));
-    Handlebars.registerPartial('typeIntersection', Handlebars.template(partialTypeIntersection));
-    Handlebars.registerPartial('base', Handlebars.template(partialBase));
+    Handlebars__namespace.registerPartial('exportEnum', Handlebars__namespace.template(partialExportEnum));
+    Handlebars__namespace.registerPartial('exportInterface', Handlebars__namespace.template(partialExportInterface));
+    Handlebars__namespace.registerPartial('exportComposition', Handlebars__namespace.template(partialExportComposition));
+    Handlebars__namespace.registerPartial('exportType', Handlebars__namespace.template(partialExportType));
+    Handlebars__namespace.registerPartial('header', Handlebars__namespace.template(partialHeader));
+    Handlebars__namespace.registerPartial('isNullable', Handlebars__namespace.template(partialIsNullable));
+    Handlebars__namespace.registerPartial('isReadOnly', Handlebars__namespace.template(partialIsReadOnly));
+    Handlebars__namespace.registerPartial('isRequired', Handlebars__namespace.template(partialIsRequired));
+    Handlebars__namespace.registerPartial('parameters', Handlebars__namespace.template(partialParameters));
+    Handlebars__namespace.registerPartial('result', Handlebars__namespace.template(partialResult));
+    Handlebars__namespace.registerPartial('schema', Handlebars__namespace.template(partialSchema));
+    Handlebars__namespace.registerPartial('schemaArray', Handlebars__namespace.template(partialSchemaArray));
+    Handlebars__namespace.registerPartial('schemaDictionary', Handlebars__namespace.template(partialSchemaDictionary));
+    Handlebars__namespace.registerPartial('schemaEnum', Handlebars__namespace.template(partialSchemaEnum));
+    Handlebars__namespace.registerPartial('schemaGeneric', Handlebars__namespace.template(partialSchemaGeneric));
+    Handlebars__namespace.registerPartial('schemaInterface', Handlebars__namespace.template(partialSchemaInterface));
+    Handlebars__namespace.registerPartial('schemaComposition', Handlebars__namespace.template(partialSchemaComposition));
+    Handlebars__namespace.registerPartial('type', Handlebars__namespace.template(partialType));
+    Handlebars__namespace.registerPartial('typeArray', Handlebars__namespace.template(partialTypeArray));
+    Handlebars__namespace.registerPartial('typeDictionary', Handlebars__namespace.template(partialTypeDictionary));
+    Handlebars__namespace.registerPartial('typeEnum', Handlebars__namespace.template(partialTypeEnum));
+    Handlebars__namespace.registerPartial('typeGeneric', Handlebars__namespace.template(partialTypeGeneric));
+    Handlebars__namespace.registerPartial('typeInterface', Handlebars__namespace.template(partialTypeInterface));
+    Handlebars__namespace.registerPartial('typeReference', Handlebars__namespace.template(partialTypeReference));
+    Handlebars__namespace.registerPartial('typeUnion', Handlebars__namespace.template(partialTypeUnion));
+    Handlebars__namespace.registerPartial('typeIntersection', Handlebars__namespace.template(partialTypeIntersection));
+    Handlebars__namespace.registerPartial('base', Handlebars__namespace.template(partialBase));
     // Generic functions used in 'request' file @see src/templates/core/request.hbs for more info
-    Handlebars.registerPartial('functions/catchErrors', Handlebars.template(functionCatchErrors));
-    Handlebars.registerPartial('functions/getFormData', Handlebars.template(functionGetFormData));
-    Handlebars.registerPartial('functions/getQueryString', Handlebars.template(functionGetQueryString));
-    Handlebars.registerPartial('functions/getUrl', Handlebars.template(functionGetUrl));
-    Handlebars.registerPartial('functions/isBinary', Handlebars.template(functionIsBinary));
-    Handlebars.registerPartial('functions/isBlob', Handlebars.template(functionIsBlob));
-    Handlebars.registerPartial('functions/isDefined', Handlebars.template(functionIsDefined));
-    Handlebars.registerPartial('functions/isString', Handlebars.template(functionIsString));
-    Handlebars.registerPartial('functions/isStringWithValue', Handlebars.template(functionIsStringWithValue));
-    Handlebars.registerPartial('functions/isSuccess', Handlebars.template(functionIsSuccess));
-    Handlebars.registerPartial('functions/resolve', Handlebars.template(functionResolve));
+    Handlebars__namespace.registerPartial('functions/catchErrors', Handlebars__namespace.template(functionCatchErrors));
+    Handlebars__namespace.registerPartial('functions/getFormData', Handlebars__namespace.template(functionGetFormData));
+    Handlebars__namespace.registerPartial('functions/getQueryString', Handlebars__namespace.template(functionGetQueryString));
+    Handlebars__namespace.registerPartial('functions/getUrl', Handlebars__namespace.template(functionGetUrl));
+    Handlebars__namespace.registerPartial('functions/isBinary', Handlebars__namespace.template(functionIsBinary));
+    Handlebars__namespace.registerPartial('functions/isBlob', Handlebars__namespace.template(functionIsBlob));
+    Handlebars__namespace.registerPartial('functions/isDefined', Handlebars__namespace.template(functionIsDefined));
+    Handlebars__namespace.registerPartial('functions/isString', Handlebars__namespace.template(functionIsString));
+    Handlebars__namespace.registerPartial('functions/isStringWithValue', Handlebars__namespace.template(functionIsStringWithValue));
+    Handlebars__namespace.registerPartial('functions/isSuccess', Handlebars__namespace.template(functionIsSuccess));
+    Handlebars__namespace.registerPartial('functions/resolve', Handlebars__namespace.template(functionResolve));
     // Specific files for the fetch client implementation
-    Handlebars.registerPartial('fetch/getHeaders', Handlebars.template(fetchGetHeaders));
-    Handlebars.registerPartial('fetch/getRequestBody', Handlebars.template(fetchGetRequestBody));
-    Handlebars.registerPartial('fetch/getResponseBody', Handlebars.template(fetchGetResponseBody));
-    Handlebars.registerPartial('fetch/getResponseHeader', Handlebars.template(fetchGetResponseHeader));
-    Handlebars.registerPartial('fetch/sendRequest', Handlebars.template(fetchSendRequest));
-    Handlebars.registerPartial('fetch/request', Handlebars.template(fetchRequest));
+    Handlebars__namespace.registerPartial('fetch/getHeaders', Handlebars__namespace.template(fetchGetHeaders));
+    Handlebars__namespace.registerPartial('fetch/getRequestBody', Handlebars__namespace.template(fetchGetRequestBody));
+    Handlebars__namespace.registerPartial('fetch/getResponseBody', Handlebars__namespace.template(fetchGetResponseBody));
+    Handlebars__namespace.registerPartial('fetch/getResponseHeader', Handlebars__namespace.template(fetchGetResponseHeader));
+    Handlebars__namespace.registerPartial('fetch/sendRequest', Handlebars__namespace.template(fetchSendRequest));
+    Handlebars__namespace.registerPartial('fetch/request', Handlebars__namespace.template(fetchRequest));
     // Specific files for the xhr client implementation
-    Handlebars.registerPartial('xhr/getHeaders', Handlebars.template(xhrGetHeaders));
-    Handlebars.registerPartial('xhr/getRequestBody', Handlebars.template(xhrGetRequestBody));
-    Handlebars.registerPartial('xhr/getResponseBody', Handlebars.template(xhrGetResponseBody));
-    Handlebars.registerPartial('xhr/getResponseHeader', Handlebars.template(xhrGetResponseHeader));
-    Handlebars.registerPartial('xhr/sendRequest', Handlebars.template(xhrSendRequest));
-    Handlebars.registerPartial('xhr/request', Handlebars.template(xhrRequest));
+    Handlebars__namespace.registerPartial('xhr/getHeaders', Handlebars__namespace.template(xhrGetHeaders));
+    Handlebars__namespace.registerPartial('xhr/getRequestBody', Handlebars__namespace.template(xhrGetRequestBody));
+    Handlebars__namespace.registerPartial('xhr/getResponseBody', Handlebars__namespace.template(xhrGetResponseBody));
+    Handlebars__namespace.registerPartial('xhr/getResponseHeader', Handlebars__namespace.template(xhrGetResponseHeader));
+    Handlebars__namespace.registerPartial('xhr/sendRequest', Handlebars__namespace.template(xhrSendRequest));
+    Handlebars__namespace.registerPartial('xhr/request', Handlebars__namespace.template(xhrRequest));
     // Specific files for the node client implementation
-    Handlebars.registerPartial('node/getHeaders', Handlebars.template(nodeGetHeaders));
-    Handlebars.registerPartial('node/getRequestBody', Handlebars.template(nodeGetRequestBody));
-    Handlebars.registerPartial('node/getResponseBody', Handlebars.template(nodeGetResponseBody));
-    Handlebars.registerPartial('node/getResponseHeader', Handlebars.template(nodeGetResponseHeader));
-    Handlebars.registerPartial('node/sendRequest', Handlebars.template(nodeSendRequest));
-    Handlebars.registerPartial('node/request', Handlebars.template(nodeRequest));
+    Handlebars__namespace.registerPartial('node/getHeaders', Handlebars__namespace.template(nodeGetHeaders));
+    Handlebars__namespace.registerPartial('node/getRequestBody', Handlebars__namespace.template(nodeGetRequestBody));
+    Handlebars__namespace.registerPartial('node/getResponseBody', Handlebars__namespace.template(nodeGetResponseBody));
+    Handlebars__namespace.registerPartial('node/getResponseHeader', Handlebars__namespace.template(nodeGetResponseHeader));
+    Handlebars__namespace.registerPartial('node/sendRequest', Handlebars__namespace.template(nodeSendRequest));
+    Handlebars__namespace.registerPartial('node/request', Handlebars__namespace.template(nodeRequest));
     return templates;
 }
 
 function isSubDirectory(parent, child) {
-    return relative(child, parent).startsWith('..');
+    return path.relative(child, parent).startsWith('..');
 }
 
 /**
@@ -4879,18 +4900,18 @@ async function writeClientCore(client, templates, outputPath, httpClient, reques
         server: client.server,
         version: client.version,
     };
-    await writeFile(resolve(outputPath, 'OpenAPI.ts'), templates.core.settings(context));
-    await writeFile(resolve(outputPath, 'ApiError.ts'), templates.core.apiError({}));
-    await writeFile(resolve(outputPath, 'ApiRequestOptions.ts'), templates.core.apiRequestOptions({}));
-    await writeFile(resolve(outputPath, 'ApiResult.ts'), templates.core.apiResult({}));
-    await writeFile(resolve(outputPath, 'request.ts'), templates.core.request(context));
+    await writeFile(path.resolve(outputPath, 'OpenAPI.ts'), templates.core.settings(context));
+    await writeFile(path.resolve(outputPath, 'ApiError.ts'), templates.core.apiError({}));
+    await writeFile(path.resolve(outputPath, 'ApiRequestOptions.ts'), templates.core.apiRequestOptions({}));
+    await writeFile(path.resolve(outputPath, 'ApiResult.ts'), templates.core.apiResult({}));
+    await writeFile(path.resolve(outputPath, 'request.ts'), templates.core.request(context));
     if (request) {
-        const requestFile = resolve(process.cwd(), request);
+        const requestFile = path.resolve(process.cwd(), request);
         const requestFileExists = await exists(requestFile);
         if (!requestFileExists) {
             throw new Error(`Custom request file "${requestFile}" does not exists`);
         }
-        await copyFile(requestFile, resolve(outputPath, 'request.ts'));
+        await copyFile(requestFile, path.resolve(outputPath, 'request.ts'));
     }
 }
 
@@ -4924,7 +4945,7 @@ function sortServicesByName(services) {
  * @param exportSchemas: Generate schemas
  */
 async function writeClientIndex(client, templates, outputPath, useUnionTypes, exportCore, exportServices, exportModels, exportSchemas) {
-    await writeFile(resolve(outputPath, 'index.ts'), templates.index({
+    await writeFile(path.resolve(outputPath, 'index.ts'), templates.index({
         exportCore,
         exportServices,
         exportModels,
@@ -4939,7 +4960,7 @@ async function writeClientIndex(client, templates, outputPath, useUnionTypes, ex
 
 function format(s) {
     let indent = 0;
-    let lines = s.split(EOL);
+    let lines = s.split(os.EOL);
     lines = lines.map(line => {
         line = line.trim().replace(/^\*/g, ' *');
         let i = indent;
@@ -4956,7 +4977,7 @@ function format(s) {
         }
         return result;
     });
-    return lines.join(EOL);
+    return lines.join(os.EOL);
 }
 
 /**
@@ -4969,7 +4990,7 @@ function format(s) {
  */
 async function writeClientModels(models, templates, outputPath, httpClient, useUnionTypes) {
     for (const model of models) {
-        const file = resolve(outputPath, `${model.name}.ts`);
+        const file = path.resolve(outputPath, `${model.name}.ts`);
         const templateResult = templates.exports.model(Object.assign(Object.assign({}, model), { httpClient,
             useUnionTypes }));
         await writeFile(file, format(templateResult));
@@ -4986,7 +5007,7 @@ async function writeClientModels(models, templates, outputPath, httpClient, useU
  */
 async function writeClientSchemas(models, templates, outputPath, httpClient, useUnionTypes) {
     for (const model of models) {
-        const file = resolve(outputPath, `$${model.name}.ts`);
+        const file = path.resolve(outputPath, `$${model.name}.ts`);
         const templateResult = templates.exports.schema(Object.assign(Object.assign({}, model), { httpClient,
             useUnionTypes }));
         await writeFile(file, format(templateResult));
@@ -5005,7 +5026,7 @@ const VERSION_TEMPLATE_STRING = 'OpenAPI.VERSION';
  */
 async function writeClientServices(services, templates, outputPath, httpClient, useUnionTypes, useOptions) {
     for (const service of services) {
-        const file = resolve(outputPath, `${service.name}.ts`);
+        const file = path.resolve(outputPath, `${service.name}.ts`);
         const useVersion = service.operations.some(operation => operation.path.includes(VERSION_TEMPLATE_STRING));
         const templateResult = templates.exports.service(Object.assign(Object.assign({}, service), { httpClient,
             useUnionTypes,
@@ -5030,11 +5051,11 @@ async function writeClientServices(services, templates, outputPath, httpClient, 
  * @param request: Path to custom request file
  */
 async function writeClient(client, templates, output, httpClient, useOptions, useUnionTypes, exportCore, exportServices, exportModels, exportSchemas, request) {
-    const outputPath = resolve(process.cwd(), output);
-    const outputPathCore = resolve(outputPath, 'core');
-    const outputPathModels = resolve(outputPath, 'models');
-    const outputPathSchemas = resolve(outputPath, 'schemas');
-    const outputPathServices = resolve(outputPath, 'services');
+    const outputPath = path.resolve(process.cwd(), output);
+    const outputPathCore = path.resolve(outputPath, 'core');
+    const outputPathModels = path.resolve(outputPath, 'models');
+    const outputPathSchemas = path.resolve(outputPath, 'schemas');
+    const outputPathServices = path.resolve(outputPath, 'services');
     if (!isSubDirectory(process.cwd(), output)) {
         throw new Error(`Output folder is not a subdirectory of the current working directory`);
     }
@@ -5080,7 +5101,7 @@ async function writeClient(client, templates, output, httpClient, useOptions, us
  * @param request: Path to custom request file
  * @param write Write the files to disk (true or false)
  */
-async function generate({ input, output, httpClient = HttpClient.FETCH, useOptions = false, useUnionTypes = false, exportCore = true, exportServices = true, exportModels = true, exportSchemas = false, request, write = true, }) {
+async function generate({ input, output, httpClient = exports.HttpClient.FETCH, useOptions = false, useUnionTypes = false, exportCore = true, exportServices = true, exportModels = true, exportSchemas = false, request, write = true, }) {
     const openApi = isString(input) ? await getOpenApiSpec(input) : input;
     const openApiVersion = getOpenApiVersion(openApi);
     const templates = registerHandlebarTemplates({
@@ -5108,4 +5129,4 @@ async function generate({ input, output, httpClient = HttpClient.FETCH, useOptio
     }
 }
 
-export { HttpClient, generate };
+exports.generate = generate;
